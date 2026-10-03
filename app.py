@@ -175,6 +175,11 @@ ANXIETY_ITEMS = [
     "Q40A", "Q41A"
 ]
 
+ZIP_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "DASS_data_21.02.19 (1).zip"
+)
+
 @st.cache_data
 def load_dataset():
 
@@ -315,18 +320,21 @@ def train_model():
     y_pred = model.predict(X_test)
 
     accuracy = accuracy_score(y_test, y_pred)
+
     precision = precision_score(
         y_test,
         y_pred,
         average="macro",
         zero_division=0
     )
+
     recall = recall_score(
         y_test,
         y_pred,
         average="macro",
         zero_division=0
     )
+
     f1 = f1_score(
         y_test,
         y_pred,
@@ -575,45 +583,60 @@ if st.button(
     risk_score = score_map[prediction]
 
     if prediction == "Normal":
+
         warning = "No Immediate Warning"
+
         recommendation = (
             "Maintain healthy sleep, recovery, social support, "
             "and regular wellbeing practices."
         )
+
         risk_class = "risk-normal"
 
     elif prediction == "Mild":
+
         warning = "Monitor"
+
         recommendation = (
             "Consider monitoring stress levels and maintaining "
             "adequate recovery, sleep, and peer support."
         )
+
         risk_class = "risk-mild"
 
     elif prediction == "Moderate":
+
         warning = "Attention Required"
+
         recommendation = (
             "Consider a welfare check-in and additional recovery "
             "support. Persistent or worsening symptoms should be "
             "referred through appropriate professional channels."
         )
+
         risk_class = "risk-moderate"
 
     elif prediction == "Severe":
+
         warning = "Attention Required"
+
         recommendation = (
             "Prioritize a welfare check-in and appropriate support. "
             "Professional assessment should be considered where "
             "symptoms are persistent or worsening."
         )
+
         risk_class = "risk-severe"
 
     else:
+
         warning = "Attention Required"
+
         recommendation = (
             "Prompt welfare attention is recommended. Appropriate "
             "professional support should be considered."
         )
+
         risk_class = "risk-extreme"
 
     st.markdown(
@@ -867,6 +890,7 @@ st.caption(
 m1, m2, m3, m4 = st.columns(4)
 
 with m1:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -880,6 +904,7 @@ with m1:
     )
 
 with m2:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -893,6 +918,7 @@ with m2:
     )
 
 with m3:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -906,6 +932,7 @@ with m3:
     )
 
 with m4:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -1113,18 +1140,21 @@ st.markdown(
 d1, d2, d3 = st.columns(3)
 
 with d1:
+
     st.metric(
         "Dataset Records",
         f"{len(y):,}"
     )
 
 with d2:
+
     st.metric(
         "Input Features",
         len(FEATURE_GROUPS)
     )
 
 with d3:
+
     st.metric(
         "DASS Items Represented",
         42
