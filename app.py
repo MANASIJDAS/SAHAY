@@ -8,9 +8,19 @@ import plotly.graph_objects as go
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
+from sklearn.model_selection import (
+    train_test_split,
+    StratifiedKFold,
+    GridSearchCV
+)
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix
+)
 
 
 st.set_page_config(
@@ -37,7 +47,11 @@ st.markdown(
     .hero {
         padding: 30px;
         border-radius: 22px;
-        background: linear-gradient(135deg, #fff4b8, #fffdf1);
+        background: linear-gradient(
+            135deg,
+            #fff4b8,
+            #fffdf1
+        );
         border: 1px solid #ead88a;
         margin-bottom: 25px;
     }
@@ -156,24 +170,56 @@ st.markdown(
 def apply_black_plotly_text(fig):
 
     fig.update_layout(
-        font=dict(color="#000000"),
-        title_font=dict(color="#000000"),
-        legend=dict(
-            font=dict(color="#000000")
+        font=dict(
+            color="#000000"
         ),
-        xaxis=dict(
-            title_font=dict(color="#000000"),
-            tickfont=dict(color="#000000")
-        ),
-        yaxis=dict(
-            title_font=dict(color="#000000"),
-            tickfont=dict(color="#000000")
+        title_font=dict(
+            color="#000000"
         )
     )
 
-    fig.update_traces(
-        textfont=dict(color="#000000")
-    )
+    if hasattr(fig.layout, "legend") and fig.layout.legend is not None:
+        fig.update_layout(
+            legend=dict(
+                font=dict(
+                    color="#000000"
+                )
+            )
+        )
+
+    if hasattr(fig.layout, "xaxis") and fig.layout.xaxis is not None:
+        fig.update_layout(
+            xaxis=dict(
+                title_font=dict(
+                    color="#000000"
+                ),
+                tickfont=dict(
+                    color="#000000"
+                )
+            )
+        )
+
+    if hasattr(fig.layout, "yaxis") and fig.layout.yaxis is not None:
+        fig.update_layout(
+            yaxis=dict(
+                title_font=dict(
+                    color="#000000"
+                ),
+                tickfont=dict(
+                    color="#000000"
+                )
+            )
+        )
+
+    for trace in fig.data:
+
+        if hasattr(trace, "textfont"):
+            try:
+                trace.textfont = dict(
+                    color="#000000"
+                )
+            except Exception:
+                pass
 
     return fig
 
@@ -307,7 +353,9 @@ ANXIETY_ITEMS = [
 
 
 ZIP_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
+    os.path.dirname(
+        os.path.abspath(__file__)
+    ),
     "DASS_data_21.02.19 (1).zip"
 )
 
@@ -320,7 +368,10 @@ def load_dataset():
             "DASS ZIP file was not found at: " + ZIP_PATH
         )
 
-    with zipfile.ZipFile(ZIP_PATH, "r") as z:
+    with zipfile.ZipFile(
+        ZIP_PATH,
+        "r"
+    ) as z:
 
         csv_files = [
             name
@@ -333,7 +384,10 @@ def load_dataset():
                 "data.csv was not found inside the ZIP file."
             )
 
-        with z.open(csv_files[0]) as f:
+        with z.open(
+            csv_files[0]
+        ) as f:
+
             data = pd.read_csv(
                 f,
                 sep="\t"
@@ -353,7 +407,9 @@ def train_model():
         required_items.extend(items)
 
     required_items = list(
-        dict.fromkeys(required_items)
+        dict.fromkeys(
+            required_items
+        )
     )
 
     missing = [
@@ -364,7 +420,8 @@ def train_model():
 
     if missing:
         raise ValueError(
-            "Missing DASS columns: " + ", ".join(missing)
+            "Missing DASS columns: " +
+            ", ".join(missing)
         )
 
     dass_scores = data[
@@ -380,9 +437,13 @@ def train_model():
 
     for feature_name, items in FEATURE_GROUPS.items():
 
-        X[feature_name] = dass_scores[
-            items
-        ].mean(axis=1)
+        X[feature_name] = (
+            dass_scores[
+                items
+            ].mean(
+                axis=1
+            )
+        )
 
     stress_sum = dass_scores[
         STRESS_ITEMS
@@ -418,12 +479,19 @@ def train_model():
     )
 
     valid = (
-        X.notna().any(axis=1)
+        X.notna().any(
+            axis=1
+        )
         & y.notna()
     )
 
-    X = X.loc[valid]
-    y = y.loc[valid]
+    X = X.loc[
+        valid
+    ]
+
+    y = y.loc[
+        valid
+    ]
 
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -527,7 +595,9 @@ def train_model():
             grid.cv_results_[
                 f"split{i}_test_score"
             ][best_index]
-            for i in range(cv.n_splits)
+            for i in range(
+                cv.n_splits
+            )
         ]
     )
 
@@ -1076,14 +1146,25 @@ if st.button(
                 mode="gauge+number",
                 value=risk_score,
                 title={
-                    "text": "Risk Score"
+                    "text": "Risk Score",
+                    "font": {
+                        "color": "#000000"
+                    }
+                },
+                number={
+                    "font": {
+                        "color": "#000000"
+                    }
                 },
                 gauge={
                     "axis": {
                         "range": [
                             0,
                             100
-                        ]
+                        ],
+                        "tickfont": {
+                            "color": "#000000"
+                        }
                     },
                     "threshold": {
                         "line": {
@@ -1163,6 +1244,7 @@ st.markdown("---")
 st.markdown(
     "## Model Performance"
 )
+
 
 st.caption(
     "Performance metrics are calculated on the held-out test set. "
