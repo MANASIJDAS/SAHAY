@@ -11,8 +11,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.model_selection import (
     train_test_split,
     StratifiedKFold,
-    GridSearchCV,
-    cross_val_score
+    GridSearchCV
 )
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (
@@ -295,17 +294,17 @@ def train_model():
                 RandomForestClassifier(
                     random_state=42,
                     class_weight="balanced",
-                    n_jobs=-1
+                    n_jobs=1
                 )
             )
         ]
     )
 
     param_grid = {
-        "classifier__n_estimators": [200, 300],
-        "classifier__max_depth": [None, 15, 20],
-        "classifier__min_samples_split": [2, 5],
-        "classifier__min_samples_leaf": [1, 2]
+        "classifier__n_estimators": [100, 150],
+        "classifier__max_depth": [None, 15],
+        "classifier__min_samples_split": [2],
+        "classifier__min_samples_leaf": [1]
     }
 
     cv = StratifiedKFold(
@@ -319,7 +318,9 @@ def train_model():
         param_grid,
         cv=cv,
         scoring="f1_macro",
-        n_jobs=-1
+        n_jobs=1,
+        pre_dispatch=1,
+        return_train_score=False
     )
 
     grid.fit(X_train, y_train)
@@ -328,7 +329,10 @@ def train_model():
 
     y_pred = model.predict(X_test)
 
-    accuracy = accuracy_score(y_test, y_pred)
+    accuracy = accuracy_score(
+        y_test,
+        y_pred
+    )
 
     precision = precision_score(
         y_test,
@@ -351,14 +355,15 @@ def train_model():
         zero_division=0
     )
 
-    cv_scores = cross_val_score(
-        model,
-        X_train,
-        y_train,
-        cv=cv,
-        scoring="f1_macro",
-        n_jobs=-1
-    )
+    best_index = grid.best_index_
+
+    cv_mean = grid.cv_results_[
+        "mean_test_score"
+    ][best_index]
+
+    cv_std = grid.cv_results_[
+        "std_test_score"
+    ][best_index]
 
     cm = confusion_matrix(
         y_test,
@@ -416,7 +421,8 @@ def train_model():
         precision,
         recall,
         f1,
-        cv_scores,
+        cv_mean,
+        cv_std,
         cm,
         importance_df,
         distribution,
@@ -436,7 +442,8 @@ try:
         precision,
         recall,
         f1,
-        cv_scores,
+        cv_mean,
+        cv_std,
         cm,
         importance_df,
         distribution,
@@ -933,7 +940,8 @@ st.markdown(
 
 st.caption(
     "Performance metrics are calculated on the held-out test set. "
-    "Cross-validation is used during model evaluation."
+    "Five-fold stratified cross-validation is used during "
+    "hyperparameter optimization."
 )
 
 
@@ -1164,7 +1172,7 @@ with cv_col1:
 
     st.metric(
         "Mean Macro F1",
-        f"{cv_scores.mean() * 100:.2f}%"
+        f"{cv_mean * 100:.2f}%"
     )
 
 
@@ -1172,29 +1180,23 @@ with cv_col2:
 
     st.metric(
         "Standard Deviation",
-        f"{cv_scores.std() * 100:.2f}%"
+        f"{cv_std * 100:.2f}%"
     )
 
 
 cv_df = pd.DataFrame(
     {
-        "Fold": [
-            "Fold 1",
-            "Fold 2",
-            "Fold 3",
-            "Fold 4",
-            "Fold 5"
-        ],
-        "Macro F1": cv_scores * 100
+        "Metric": ["Mean Macro F1"],
+        "Score": [cv_mean * 100]
     }
 )
 
 
 fig_cv = px.bar(
     cv_df,
-    x="Fold",
-    y="Macro F1",
-    text="Macro F1"
+    x="Metric",
+    y="Score",
+    text="Score"
 )
 
 
