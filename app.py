@@ -23,12 +23,14 @@ from sklearn.metrics import (
     confusion_matrix
 )
 
+
 st.set_page_config(
     page_title="SAHAY | Stress & Welfare Monitoring",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
 
 st.markdown(
     """
@@ -140,6 +142,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
 FEATURE_GROUPS = {
     "Positive Feelings": ["Q3A", "Q5A", "Q16A"],
     "Motivation & Drive": ["Q10A", "Q17A", "Q31A"],
@@ -157,11 +160,13 @@ FEATURE_GROUPS = {
     "Emotional Reactions": ["Q1A", "Q19A", "Q40A"]
 }
 
+
 STRESS_ITEMS = [
     "Q1A", "Q6A", "Q8A", "Q11A", "Q12A", "Q14A",
     "Q18A", "Q22A", "Q27A", "Q29A", "Q32A", "Q33A",
     "Q35A", "Q39A"
 ]
+
 
 DEPRESSION_ITEMS = [
     "Q3A", "Q5A", "Q10A", "Q13A", "Q16A", "Q17A",
@@ -169,16 +174,19 @@ DEPRESSION_ITEMS = [
     "Q38A", "Q42A"
 ]
 
+
 ANXIETY_ITEMS = [
     "Q2A", "Q4A", "Q7A", "Q9A", "Q15A", "Q19A",
     "Q20A", "Q23A", "Q25A", "Q28A", "Q30A", "Q36A",
     "Q40A", "Q41A"
 ]
 
+
 ZIP_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "DASS_data_21.02.19 (1).zip"
 )
+
 
 @st.cache_data
 def load_dataset():
@@ -201,9 +209,10 @@ def load_dataset():
             )
 
         with z.open(csv_files[0]) as f:
-            data = pd.read_csv(f)
+            data = pd.read_csv(f, sep="\t")
 
     return data
+
 
 @st.cache_resource
 def train_model():
@@ -414,6 +423,7 @@ def train_model():
         grid.best_params_
     )
 
+
 try:
 
     (
@@ -438,6 +448,7 @@ except Exception as e:
     st.error(str(e))
     st.stop()
 
+
 st.markdown(
     """
     <div class="hero">
@@ -457,6 +468,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 with st.sidebar:
 
@@ -484,6 +496,7 @@ with st.sidebar:
         """
     )
 
+
 st.markdown(
     "## Personnel Assessment"
 )
@@ -495,6 +508,7 @@ st.markdown(
 user_values = {}
 
 feature_names = list(FEATURE_GROUPS.keys())
+
 
 for row_start in range(0, len(feature_names), 3):
 
@@ -536,13 +550,24 @@ for row_start in range(0, len(feature_names), 3):
                 unsafe_allow_html=True
             )
 
+
 st.markdown("---")
+
 
 if st.button(
     "🔍 Assess Stress Risk",
     use_container_width=True,
     type="primary"
 ):
+
+    if not all(
+        isinstance(value, (int, np.integer)) and 0 <= value <= 3
+        for value in user_values.values()
+    ):
+        st.error(
+            "Each assessment response must be an integer from 0 to 3."
+        )
+        st.stop()
 
     input_df = pd.DataFrame(
         [user_values],
@@ -639,11 +664,14 @@ if st.button(
 
         risk_class = "risk-extreme"
 
+
     st.markdown(
         "## Assessment Result"
     )
 
+
     c1, c2, c3 = st.columns(3)
+
 
     with c1:
 
@@ -664,6 +692,7 @@ if st.button(
             unsafe_allow_html=True
         )
 
+
     with c2:
 
         st.markdown(
@@ -682,6 +711,7 @@ if st.button(
             """,
             unsafe_allow_html=True
         )
+
 
     with c3:
 
@@ -702,9 +732,12 @@ if st.button(
             unsafe_allow_html=True
         )
 
+
     st.markdown("")
 
+
     c4, c5 = st.columns(2)
+
 
     with c4:
 
@@ -725,6 +758,7 @@ if st.button(
             unsafe_allow_html=True
         )
 
+
     with c5:
 
         st.markdown(
@@ -744,11 +778,14 @@ if st.button(
             unsafe_allow_html=True
         )
 
+
     st.markdown("")
+
 
     st.markdown(
         "### Welfare Recommendation"
     )
+
 
     st.markdown(
         f"""
@@ -759,9 +796,12 @@ if st.button(
         unsafe_allow_html=True
     )
 
+
     st.markdown("")
 
+
     col1, col2 = st.columns(2)
+
 
     with col1:
 
@@ -805,6 +845,7 @@ if st.button(
             use_container_width=True
         )
 
+
     with col2:
 
         st.markdown(
@@ -841,9 +882,11 @@ if st.button(
             use_container_width=True
         )
 
+
     st.markdown(
         "### Input Profile"
     )
+
 
     input_chart_df = pd.DataFrame(
         {
@@ -856,6 +899,7 @@ if st.button(
         }
     )
 
+
     fig_input = px.bar(
         input_chart_df,
         x="Response",
@@ -864,6 +908,7 @@ if st.button(
         range_x=[0, 3]
     )
 
+
     fig_input.update_layout(
         plot_bgcolor="#fffdf4",
         paper_bgcolor="#fffdf4",
@@ -871,23 +916,29 @@ if st.button(
         yaxis_title=""
     )
 
+
     st.plotly_chart(
         fig_input,
         use_container_width=True
     )
 
+
 st.markdown("---")
+
 
 st.markdown(
     "## Model Performance"
 )
+
 
 st.caption(
     "Performance metrics are calculated on the held-out test set. "
     "Cross-validation is used during model evaluation."
 )
 
+
 m1, m2, m3, m4 = st.columns(4)
+
 
 with m1:
 
@@ -903,6 +954,7 @@ with m1:
         unsafe_allow_html=True
     )
 
+
 with m2:
 
     st.markdown(
@@ -916,6 +968,7 @@ with m2:
         """,
         unsafe_allow_html=True
     )
+
 
 with m3:
 
@@ -931,6 +984,7 @@ with m3:
         unsafe_allow_html=True
     )
 
+
 with m4:
 
     st.markdown(
@@ -945,7 +999,9 @@ with m4:
         unsafe_allow_html=True
     )
 
+
 st.markdown("")
+
 
 perf_df = pd.DataFrame(
     {
@@ -964,6 +1020,7 @@ perf_df = pd.DataFrame(
     }
 )
 
+
 fig_perf = px.bar(
     perf_df,
     x="Metric",
@@ -971,10 +1028,12 @@ fig_perf = px.bar(
     text="Score"
 )
 
+
 fig_perf.update_traces(
     texttemplate="%{text:.2f}%",
     textposition="outside"
 )
+
 
 fig_perf.update_layout(
     yaxis_range=[0, 100],
@@ -983,18 +1042,22 @@ fig_perf.update_layout(
     paper_bgcolor="#fffdf4"
 )
 
+
 st.plotly_chart(
     fig_perf,
     use_container_width=True
 )
 
+
 col1, col2 = st.columns(2)
+
 
 with col1:
 
     st.markdown(
         "### Confusion Matrix"
     )
+
 
     labels = [
         "Normal",
@@ -1004,17 +1067,20 @@ with col1:
         "Extremely Severe"
     ]
 
+
     cm_df = pd.DataFrame(
         cm,
         index=labels,
         columns=labels
     )
 
+
     fig_cm = px.imshow(
         cm_df,
         text_auto=True,
         aspect="auto"
     )
+
 
     fig_cm.update_layout(
         xaxis_title="Predicted",
@@ -1023,16 +1089,19 @@ with col1:
         paper_bgcolor="#fffdf4"
     )
 
+
     st.plotly_chart(
         fig_cm,
         use_container_width=True
     )
+
 
 with col2:
 
     st.markdown(
         "### Feature Importance"
     )
+
 
     fig_imp = px.bar(
         importance_df,
@@ -1041,6 +1110,7 @@ with col2:
         orientation="h"
     )
 
+
     fig_imp.update_layout(
         xaxis_title="Importance",
         yaxis_title="",
@@ -1048,14 +1118,17 @@ with col2:
         paper_bgcolor="#fffdf4"
     )
 
+
     st.plotly_chart(
         fig_imp,
         use_container_width=True
     )
 
+
 st.markdown(
     "### Dataset Stress-Level Distribution"
 )
+
 
 fig_dist = px.bar(
     distribution,
@@ -1064,6 +1137,7 @@ fig_dist = px.bar(
     text="Count"
 )
 
+
 fig_dist.update_layout(
     xaxis_title="Stress Level",
     yaxis_title="Number of Records",
@@ -1071,16 +1145,20 @@ fig_dist.update_layout(
     paper_bgcolor="#fffdf4"
 )
 
+
 st.plotly_chart(
     fig_dist,
     use_container_width=True
 )
 
+
 st.markdown(
     "### 5-Fold Cross-Validation"
 )
 
+
 cv_col1, cv_col2 = st.columns(2)
+
 
 with cv_col1:
 
@@ -1089,12 +1167,14 @@ with cv_col1:
         f"{cv_scores.mean() * 100:.2f}%"
     )
 
+
 with cv_col2:
 
     st.metric(
         "Standard Deviation",
         f"{cv_scores.std() * 100:.2f}%"
     )
+
 
 cv_df = pd.DataFrame(
     {
@@ -1109,6 +1189,7 @@ cv_df = pd.DataFrame(
     }
 )
 
+
 fig_cv = px.bar(
     cv_df,
     x="Fold",
@@ -1116,10 +1197,12 @@ fig_cv = px.bar(
     text="Macro F1"
 )
 
+
 fig_cv.update_traces(
     texttemplate="%{text:.2f}%",
     textposition="outside"
 )
+
 
 fig_cv.update_layout(
     yaxis_range=[0, 100],
@@ -1128,16 +1211,20 @@ fig_cv.update_layout(
     paper_bgcolor="#fffdf4"
 )
 
+
 st.plotly_chart(
     fig_cv,
     use_container_width=True
 )
 
+
 st.markdown(
     "### Dataset Information"
 )
 
+
 d1, d2, d3 = st.columns(3)
+
 
 with d1:
 
@@ -1146,12 +1233,14 @@ with d1:
         f"{len(y):,}"
     )
 
+
 with d2:
 
     st.metric(
         "Input Features",
         len(FEATURE_GROUPS)
     )
+
 
 with d3:
 
@@ -1160,11 +1249,13 @@ with d3:
         42
     )
 
+
 st.markdown(
     """
     <div class="card">
 
     <b>Important note:</b>
+
     SAHAY is a research/academic prototype based on DASS-42
     responses. The displayed risk probability, risk score,
     confidence, and welfare recommendations are application-level
