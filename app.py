@@ -36,12 +36,38 @@ st.markdown(
     <style>
 
     .stApp {
-        background: #fffbea;
-        color: #302a20;
+        background: #fffbea !important;
+        color: #000000 !important;
+    }
+
+    .stApp *,
+    section[data-testid="stSidebar"] * {
+        color: #000000 !important;
     }
 
     section[data-testid="stSidebar"] {
-        background: #fff7d6;
+        background: #fff7d6 !important;
+    }
+
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] div {
+        color: #000000 !important;
+    }
+
+    .stMarkdown,
+    .stMarkdown p,
+    .stMarkdown span,
+    .stMarkdown div,
+    .stCaption,
+    label,
+    p {
+        color: #000000 !important;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #000000 !important;
     }
 
     .hero {
@@ -59,12 +85,12 @@ st.markdown(
     .hero h1 {
         font-size: 42px;
         margin-bottom: 5px;
-        color: #3b321d;
+        color: #000000 !important;
     }
 
     .hero p {
         font-size: 17px;
-        color: #62583d;
+        color: #000000 !important;
     }
 
     .card {
@@ -74,6 +100,12 @@ st.markdown(
         padding: 22px;
         margin-bottom: 18px;
         box-shadow: 0px 3px 12px rgba(80,70,30,0.07);
+    }
+
+    .card *,
+    .metric-card *,
+    .recommendation * {
+        color: #000000 !important;
     }
 
     .metric-card {
@@ -86,43 +118,23 @@ st.markdown(
     }
 
     .metric-title {
-        color: #756b50;
+        color: #000000 !important;
         font-size: 14px;
         margin-bottom: 8px;
     }
 
     .metric-value {
-        color: #332b1c;
+        color: #000000 !important;
         font-size: 28px;
         font-weight: 700;
     }
 
-    .risk-normal {
-        color: #347a46;
-        font-size: 30px;
-        font-weight: 700;
-    }
-
-    .risk-mild {
-        color: #a17819;
-        font-size: 30px;
-        font-weight: 700;
-    }
-
-    .risk-moderate {
-        color: #c36c13;
-        font-size: 30px;
-        font-weight: 700;
-    }
-
-    .risk-severe {
-        color: #bd4b32;
-        font-size: 30px;
-        font-weight: 700;
-    }
-
+    .risk-normal,
+    .risk-mild,
+    .risk-moderate,
+    .risk-severe,
     .risk-extreme {
-        color: #9d3030;
+        color: #000000 !important;
         font-size: 30px;
         font-weight: 700;
     }
@@ -134,12 +146,82 @@ st.markdown(
         border-radius: 12px;
         font-size: 16px;
         line-height: 1.6;
+        color: #000000 !important;
+    }
+
+    [data-testid="stMetricLabel"],
+    [data-testid="stMetricValue"],
+    [data-testid="stMetricDelta"] {
+        color: #000000 !important;
+    }
+
+    [data-testid="stWidgetLabel"],
+    [data-testid="stWidgetLabel"] *,
+    [data-testid="stSlider"] *,
+    [data-testid="stSelectbox"] *,
+    [data-testid="stNumberInput"] * {
+        color: #000000 !important;
+    }
+
+    .stButton button {
+        color: #000000 !important;
+    }
+
+    .stInfo,
+    .stInfo *,
+    .stSuccess,
+    .stSuccess *,
+    .stWarning,
+    .stWarning *,
+    .stError,
+    .stError * {
+        color: #000000 !important;
     }
 
     </style>
     """,
     unsafe_allow_html=True
 )
+
+
+def apply_black_plotly_text(fig):
+    fig.update_layout(
+        font=dict(
+            color="#000000"
+        ),
+        title_font=dict(
+            color="#000000"
+        ),
+        legend=dict(
+            font=dict(
+                color="#000000"
+            )
+        ),
+        xaxis=dict(
+            title_font=dict(
+                color="#000000"
+            ),
+            tickfont=dict(
+                color="#000000"
+            )
+        ),
+        yaxis=dict(
+            title_font=dict(
+                color="#000000"
+            ),
+            tickfont=dict(
+                color="#000000"
+            )
+        )
+    )
+
+    fig.update_traces(
+        textfont=dict(
+            color="#000000"
+        )
+    )
+
+    return fig
 
 
 FEATURE_GROUPS = {
@@ -847,6 +929,8 @@ if st.button(
             paper_bgcolor="#fffdf4"
         )
 
+        fig = apply_black_plotly_text(fig)
+
         st.plotly_chart(
             fig,
             use_container_width=True
@@ -864,11 +948,22 @@ if st.button(
                 mode="gauge+number",
                 value=risk_score,
                 title={
-                    "text": "Risk Score"
+                    "text": "Risk Score",
+                    "font": {
+                        "color": "#000000"
+                    }
+                },
+                number={
+                    "font": {
+                        "color": "#000000"
+                    }
                 },
                 gauge={
                     "axis": {
-                        "range": [0, 100]
+                        "range": [0, 100],
+                        "tickfont": {
+                            "color": "#000000"
+                        }
                     },
                     "threshold": {
                         "line": {
@@ -881,7 +976,10 @@ if st.button(
         )
 
         gauge.update_layout(
-            paper_bgcolor="#fffdf4"
+            paper_bgcolor="#fffdf4",
+            font={
+                "color": "#000000"
+            }
         )
 
         st.plotly_chart(
@@ -922,6 +1020,8 @@ if st.button(
         xaxis_title="DASS Response",
         yaxis_title=""
     )
+
+    fig_input = apply_black_plotly_text(fig_input)
 
 
     st.plotly_chart(
@@ -1050,6 +1150,8 @@ fig_perf.update_layout(
     paper_bgcolor="#fffdf4"
 )
 
+fig_perf = apply_black_plotly_text(fig_perf)
+
 
 st.plotly_chart(
     fig_perf,
@@ -1097,6 +1199,8 @@ with col1:
         paper_bgcolor="#fffdf4"
     )
 
+    fig_cm = apply_black_plotly_text(fig_cm)
+
 
     st.plotly_chart(
         fig_cm,
@@ -1126,6 +1230,8 @@ with col2:
         paper_bgcolor="#fffdf4"
     )
 
+    fig_imp = apply_black_plotly_text(fig_imp)
+
 
     st.plotly_chart(
         fig_imp,
@@ -1152,6 +1258,8 @@ fig_dist.update_layout(
     plot_bgcolor="#fffdf4",
     paper_bgcolor="#fffdf4"
 )
+
+fig_dist = apply_black_plotly_text(fig_dist)
 
 
 st.plotly_chart(
@@ -1212,6 +1320,8 @@ fig_cv.update_layout(
     plot_bgcolor="#fffdf4",
     paper_bgcolor="#fffdf4"
 )
+
+fig_cv = apply_black_plotly_text(fig_cv)
 
 
 st.plotly_chart(
